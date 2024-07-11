@@ -1,4 +1,4 @@
-package ru.clevertec.check.utils;
+package ru.clevertec.check.utils.Csv;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
