@@ -1,4 +1,4 @@
-package main.java.ru.clevertec.check.util.argument.marshaler;
+package main.java.ru.clevertec.check.argument.marshaler;
 
 public class DiscountCardMarshaler implements ArgumentMarshaler {
 

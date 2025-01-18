@@ -1,10 +1,10 @@
-package main.java.ru.clevertec.check.util.argument;
+package main.java.ru.clevertec.check.argument;
 
 import main.java.ru.clevertec.check.exception.BadRequestException;
-import main.java.ru.clevertec.check.util.argument.marshaler.ArgumentMarshaler;
-import main.java.ru.clevertec.check.util.argument.marshaler.BalanceDebitCardMarshaler;
-import main.java.ru.clevertec.check.util.argument.marshaler.DiscountCardMarshaler;
-import main.java.ru.clevertec.check.util.argument.marshaler.ProductQuantityMarshaler;
+import main.java.ru.clevertec.check.argument.marshaler.ArgumentMarshaler;
+import main.java.ru.clevertec.check.argument.marshaler.BalanceDebitCardMarshaler;
+import main.java.ru.clevertec.check.argument.marshaler.DiscountCardMarshaler;
+import main.java.ru.clevertec.check.argument.marshaler.ProductQuantityMarshaler;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
