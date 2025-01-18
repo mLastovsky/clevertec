@@ -17,34 +17,27 @@ public class CsvProductRepository implements Csv, ProductRepository {
 
     @Override
     public List<Product> findAll() {
-        List<Product> result = new ArrayList<>();
-
         try {
-            var values = readCsvFile(DEFAULT_PRODUCTS_FILE_PATH);
-            result = values.stream()
+            return readCsvFile(DEFAULT_PRODUCTS_FILE_PATH).stream()
                     .map(csvProductMapper::mapFrom)
                     .toList();
 
         } catch (IOException e) {
             throw new RepositoryException(e);
         }
-
-        return result;
     }
 
     @Override
     public Optional<Product> findById(Long id) {
-        List<String> values = null;
         try {
-            values = readCsvFile(DEFAULT_PRODUCTS_FILE_PATH);
+            return readCsvFile(DEFAULT_PRODUCTS_FILE_PATH).stream()
+                    .map(csvProductMapper::mapFrom)
+                    .filter(product -> product.getId().equals(id))
+                    .findFirst();
+
         } catch (IOException e) {
             throw new RepositoryException(e);
         }
-
-        return values.stream()
-                .map(csvProductMapper::mapFrom)
-                .filter(product -> product.getId().equals(id))
-                .findFirst();
     }
 
     @Override
