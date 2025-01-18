@@ -1,4 +1,4 @@
-package main.java.ru.clevertec.check.argument.marshaler;
+package main.java.ru.clevertec.check.parser.argument.marshaler;
 
 import java.util.HashMap;
 import java.util.Map;
