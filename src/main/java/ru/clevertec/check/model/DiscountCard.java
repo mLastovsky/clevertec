@@ -66,9 +66,9 @@ public class DiscountCard extends Entity {
     @Override
     public String toString() {
         return "DiscountCard{" +
-                "number='" + number + '\'' +
+                "id=" + id +
+                ", number='" + number + '\'' +
                 ", discountAmount=" + discountAmount +
-                ", id=" + id +
                 '}';
     }
 }

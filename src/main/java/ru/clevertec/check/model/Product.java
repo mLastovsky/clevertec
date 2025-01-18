@@ -45,6 +45,11 @@ public class Product extends Entity {
         private int quantityInStock;
         private boolean wholesaleProduct;
 
+        public builder id(Long id) {
+            this.id = id;
+            return this;
+        }
+
         public builder description(String description) {
             this.description = description;
             return this;
@@ -86,11 +91,11 @@ public class Product extends Entity {
     @Override
     public String toString() {
         return "Product{" +
-                "description='" + description + '\'' +
+                "id=" + id +
+                ", description='" + description + '\'' +
                 ", price=" + price +
                 ", quantityInStock=" + quantityInStock +
                 ", wholesaleProduct=" + wholesaleProduct +
-                ", id=" + id +
                 '}';
     }
 }
