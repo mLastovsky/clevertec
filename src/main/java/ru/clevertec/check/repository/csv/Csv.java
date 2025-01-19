@@ -9,6 +9,7 @@ import static java.nio.file.StandardOpenOption.*;
 
 public interface Csv {
 
+    String SEPARATOR = ";";
     int HEADER_ROW_INDEX = 1;
 
     default List<String> readCsvFile(Path path) throws IOException {
