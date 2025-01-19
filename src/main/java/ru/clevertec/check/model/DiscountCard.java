@@ -14,7 +14,7 @@ public class DiscountCard extends Entity {
     }
 
     public static builder builder() {
-        return builder();
+        return new builder();
     }
 
     public String getNumber() {
