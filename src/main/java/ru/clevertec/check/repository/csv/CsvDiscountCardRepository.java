@@ -41,6 +41,19 @@ public class CsvDiscountCardRepository implements Csv, DiscountCardRepository {
     }
 
     @Override
+    public Optional<DiscountCard> findByNumber(String number) {
+        try {
+            return readCsvFile(DEFAULT_DISCOUNT_CARD_FILE_PATH).stream()
+                    .map(csvDiscountCardMapper::mapFrom)
+                    .filter(product -> product.getNumber().equals(number))
+                    .findFirst();
+
+        } catch (IOException e) {
+            throw new RepositoryException(e);
+        }
+    }
+
+    @Override
     public void update(DiscountCard entity) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
