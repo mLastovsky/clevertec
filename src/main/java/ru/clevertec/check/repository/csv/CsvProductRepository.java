@@ -12,7 +12,7 @@ import java.util.Optional;
 
 public class CsvProductRepository implements Csv, ProductRepository {
 
-    private static final Path DEFAULT_PRODUCTS_FILE_PATH = Path.of("src", "main", "resources", "products.csv");
+    private static final Path DEFAULT_PRODUCTS_FILE_PATH = Path.of("src/main/resources/products.csv");
     private static final CsvProductMapper csvProductMapper = new CsvProductMapper();
 
     @Override

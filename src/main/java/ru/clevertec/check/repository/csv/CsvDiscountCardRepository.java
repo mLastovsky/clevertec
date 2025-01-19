@@ -12,13 +12,13 @@ import java.util.Optional;
 
 public class CsvDiscountCardRepository implements Csv, DiscountCardRepository {
 
-    private static final Path DEFAULT_PRODUCTS_FILE_PATH = Path.of("src", "main", "resources", "discountCards.csv");
+    private static final Path DEFAULT_DISCOUNT_CARD_FILE_PATH = Path.of("./src/main/resources/discountCards.csv");
     private static final CsvDiscountCardMapper csvDiscountCardMapper = new CsvDiscountCardMapper();
 
     @Override
     public List<DiscountCard> findAll() {
         try {
-            return readCsvFile(DEFAULT_PRODUCTS_FILE_PATH).stream()
+            return readCsvFile(DEFAULT_DISCOUNT_CARD_FILE_PATH).stream()
                     .map(csvDiscountCardMapper::mapFrom)
                     .toList();
 
@@ -30,7 +30,7 @@ public class CsvDiscountCardRepository implements Csv, DiscountCardRepository {
     @Override
     public Optional<DiscountCard> findById(Long id) {
         try {
-            return readCsvFile(DEFAULT_PRODUCTS_FILE_PATH).stream()
+            return readCsvFile(DEFAULT_DISCOUNT_CARD_FILE_PATH).stream()
                     .map(csvDiscountCardMapper::mapFrom)
                     .filter(product -> product.getId().equals(id))
                     .findFirst();
