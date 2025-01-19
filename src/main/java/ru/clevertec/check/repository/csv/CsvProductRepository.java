@@ -1,12 +1,12 @@
-package main.java.ru.clevertec.check.repository;
+package main.java.ru.clevertec.check.repository.csv;
 
 import main.java.ru.clevertec.check.exception.RepositoryException;
 import main.java.ru.clevertec.check.mapper.csv.CsvProductMapper;
 import main.java.ru.clevertec.check.model.Product;
+import main.java.ru.clevertec.check.repository.ProductRepository;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 

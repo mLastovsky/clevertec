@@ -1,8 +1,9 @@
-package main.java.ru.clevertec.check.repository;
+package main.java.ru.clevertec.check.repository.csv;
 
 import main.java.ru.clevertec.check.exception.RepositoryException;
 import main.java.ru.clevertec.check.mapper.csv.CsvDiscountCardMapper;
 import main.java.ru.clevertec.check.model.DiscountCard;
+import main.java.ru.clevertec.check.repository.DiscountCardRepository;
 
 import java.io.IOException;
 import java.nio.file.Path;
