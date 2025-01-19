@@ -44,7 +44,7 @@ public class Check {
             return this;
         }
 
-        public builder setTime(LocalTime time) {
+        public builder time(LocalTime time) {
             this.time = time;
             return this;
         }
