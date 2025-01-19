@@ -1,4 +1,4 @@
-package main.java.ru.clevertec.check.repository.csv;
+package main.java.ru.clevertec.check.util;
 
 import java.io.IOException;
 import java.nio.file.Files;
