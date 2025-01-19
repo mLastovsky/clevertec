@@ -74,4 +74,8 @@ public class ArgsParser {
     public Map<String, ArgumentMarshaler> getMarshalers() {
         return marshalers;
     }
+
+    public ArgumentMarshaler getMarshalerByName(String name) {
+        return marshalers.get(name);
+    }
 }
