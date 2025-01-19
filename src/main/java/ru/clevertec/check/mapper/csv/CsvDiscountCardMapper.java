@@ -10,7 +10,7 @@ public class CsvDiscountCardMapper implements CsvMapper<String, DiscountCard> {
 
     @Override
     public DiscountCard mapFrom(String csvRow) {
-        var fields = csvRow.split(COLUMN_SEPARATOR);
+        var fields = csvRow.split(SEPARATOR);
 
         return DiscountCard.builder()
                 .id(Long.parseLong(fields[ID_INDEX]))
@@ -22,7 +22,7 @@ public class CsvDiscountCardMapper implements CsvMapper<String, DiscountCard> {
     @Override
     public String mapTo(DiscountCard discountCard) {
         return String.join(
-                COLUMN_SEPARATOR,
+                SEPARATOR,
                 String.valueOf(discountCard.getId()),
                 discountCard.getNumber(),
                 String.valueOf(discountCard.getDiscountAmount())

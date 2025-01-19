@@ -14,7 +14,7 @@ public class CsvProductMapper implements CsvMapper<String, Product> {
 
     @Override
     public Product mapFrom(String csv) {
-        var fields = csv.split(COLUMN_SEPARATOR);
+        var fields = csv.split(SEPARATOR);
 
         return Product.builder()
                 .id(Long.parseLong(fields[ID_INDEX]))
@@ -27,7 +27,7 @@ public class CsvProductMapper implements CsvMapper<String, Product> {
 
     @Override
     public String mapTo(Product product) {
-        return String.join(COLUMN_SEPARATOR,
+        return String.join(SEPARATOR,
                 String.valueOf(product.getId()),
                 product.getDescription(),
                 product.getPrice().toString(),
