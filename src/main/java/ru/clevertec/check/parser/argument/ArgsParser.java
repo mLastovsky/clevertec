@@ -9,6 +9,7 @@ import main.java.ru.clevertec.check.parser.argument.marshaler.ProductQuantityMar
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 public class ArgsParser {
@@ -76,7 +77,7 @@ public class ArgsParser {
         return marshalers;
     }
 
-    public ArgumentMarshaler getMarshalerByName(String name) {
-        return marshalers.get(name);
+    public Optional<ArgumentMarshaler> getMarshalerByName(String name) {
+        return Optional.of(marshalers.get(name));
     }
 }
