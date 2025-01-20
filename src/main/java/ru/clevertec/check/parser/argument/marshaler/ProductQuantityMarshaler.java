@@ -5,12 +5,12 @@ import java.util.Map;
 
 public class ProductQuantityMarshaler implements ArgumentMarshaler{
 
-    private final Map<Integer, Integer> productQuantity = new HashMap<>();
+    private final Map<Long, Integer> productQuantity = new HashMap<>();
 
     @Override
     public void addValue(Object... values) {
-        int productId = (Integer) values[0];
-        int quantity = (Integer) values[1];
+        var productId = (Long) values[0];
+        var quantity = (Integer) values[1];
 
         productQuantity.merge(productId, quantity, Integer::sum);
     }
