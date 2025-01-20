@@ -5,18 +5,18 @@ import java.util.Objects;
 
 public class CheckItem {
 
-    private final Product product;
     private final int quantityProduct;
-    private final BigDecimal totalPriceWithoutDiscount;
+    private final Product product;
+    private final BigDecimal price;
     private final BigDecimal discount;
-    private final BigDecimal finalPrice;
+    private final BigDecimal total;
 
     private CheckItem(builder builder) {
-        this.product = builder.product;
         this.quantityProduct = builder.quantityProduct;
-        this.totalPriceWithoutDiscount = builder.totalPriceWithoutDiscount;
+        this.product = builder.product;
+        this.price = builder.price;
         this.discount = builder.discount;
-        this.finalPrice = builder.finalPrice;
+        this.total = builder.total;
     }
 
     public static builder builder() {
@@ -24,11 +24,11 @@ public class CheckItem {
     }
 
     public static class builder {
-        private Product product;
         private int quantityProduct;
-        private BigDecimal totalPriceWithoutDiscount = BigDecimal.ZERO;
+        private Product product;
+        private BigDecimal price = BigDecimal.ZERO;
         private BigDecimal discount = BigDecimal.ZERO;
-        private BigDecimal finalPrice = BigDecimal.ZERO;
+        private BigDecimal total = BigDecimal.ZERO;
 
         public builder product(Product product) {
             this.product = product;
@@ -40,8 +40,8 @@ public class CheckItem {
             return this;
         }
 
-        public builder totalPriceWithoutDiscount(BigDecimal totalPriceWithoutDiscount) {
-            this.totalPriceWithoutDiscount = totalPriceWithoutDiscount;
+        public builder price(BigDecimal price) {
+            this.price = price;
             return this;
         }
 
@@ -50,8 +50,8 @@ public class CheckItem {
             return this;
         }
 
-        public builder finalPrice(BigDecimal finalPrice) {
-            this.finalPrice = finalPrice;
+        public builder total(BigDecimal total) {
+            this.total = total;
             return this;
         }
 
@@ -68,16 +68,16 @@ public class CheckItem {
         return quantityProduct;
     }
 
-    public BigDecimal getTotalPriceWithoutDiscount() {
-        return totalPriceWithoutDiscount;
+    public BigDecimal getPrice() {
+        return price;
     }
 
     public BigDecimal getDiscount() {
         return discount;
     }
 
-    public BigDecimal getFinalPrice() {
-        return finalPrice;
+    public BigDecimal getTotal() {
+        return total;
     }
 
     @Override
@@ -85,12 +85,12 @@ public class CheckItem {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         CheckItem checkItem = (CheckItem) o;
-        return quantityProduct == checkItem.quantityProduct && Objects.equals(product, checkItem.product) && Objects.equals(totalPriceWithoutDiscount, checkItem.totalPriceWithoutDiscount) && Objects.equals(discount, checkItem.discount) && Objects.equals(finalPrice, checkItem.finalPrice);
+        return quantityProduct == checkItem.quantityProduct && Objects.equals(product, checkItem.product) && Objects.equals(price, checkItem.price) && Objects.equals(discount, checkItem.discount) && Objects.equals(total, checkItem.total);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(product, quantityProduct, totalPriceWithoutDiscount, discount, finalPrice);
+        return Objects.hash(product, quantityProduct, price, discount, total);
     }
 
     @Override
@@ -98,9 +98,9 @@ public class CheckItem {
         return "CheckItem{" +
                 "product=" + product +
                 ", quantityProduct=" + quantityProduct +
-                ", totalPriceWithoutDiscount=" + totalPriceWithoutDiscount +
+                ", totalPriceWithoutDiscount=" + price +
                 ", discount=" + discount +
-                ", finalPrice=" + finalPrice +
+                ", finalPrice=" + total +
                 '}';
     }
 }
