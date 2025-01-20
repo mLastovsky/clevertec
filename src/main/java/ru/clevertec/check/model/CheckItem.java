@@ -96,11 +96,11 @@ public class CheckItem {
     @Override
     public String toString() {
         return "CheckItem{" +
-                "product=" + product +
-                ", quantityProduct=" + quantityProduct +
-                ", totalPriceWithoutDiscount=" + price +
+                "quantityProduct=" + quantityProduct +
+                ", product=" + product +
+                ", price=" + price +
                 ", discount=" + discount +
-                ", finalPrice=" + total +
+                ", total=" + total +
                 '}';
     }
 }
