@@ -39,6 +39,7 @@ public class ArgsParser {
 
         } else if (element.matches(BALANCE_DEBIT_CARD_REGEX_TEMPLATE)) {
             processBalanceDebitCard(element);
+
         } else {
             throw new BadRequestException();
         }
