@@ -12,7 +12,7 @@ public class Check {
     private final LocalTime time;
     private final List<CheckItem> items;
     private final DiscountCard discountCard;
-    private final BigDecimal totalPriceWithoutDiscountCard;
+    private final BigDecimal totalPrice;
     private final BigDecimal totalDiscount;
     private final BigDecimal totalWithDiscount;
 
@@ -21,7 +21,7 @@ public class Check {
         this.time = builder.time;
         this.items = builder.items;
         this.discountCard = builder.discountCard;
-        this.totalPriceWithoutDiscountCard = builder.totalPriceWithoutDiscountCard;
+        this.totalPrice = builder.totalPrice;
         this.totalDiscount = builder.totalDiscount;
         this.totalWithDiscount = builder.totalWithDiscount;
     }
@@ -35,7 +35,7 @@ public class Check {
         private LocalTime time;
         private List<CheckItem> items;
         private DiscountCard discountCard;
-        private BigDecimal totalPriceWithoutDiscountCard = BigDecimal.ZERO;
+        private BigDecimal totalPrice = BigDecimal.ZERO;
         private BigDecimal totalDiscount = BigDecimal.ZERO;
         private BigDecimal totalWithDiscount = BigDecimal.ZERO;
 
@@ -59,8 +59,8 @@ public class Check {
             return this;
         }
 
-        public builder totalPriceWithoutDiscountCard(BigDecimal totalPriceWithoutDiscountCard) {
-            this.totalPriceWithoutDiscountCard = totalPriceWithoutDiscountCard;
+        public builder totalPrice(BigDecimal totalPrice) {
+            this.totalPrice = totalPrice;
             return this;
         }
 
@@ -95,8 +95,8 @@ public class Check {
         return discountCard;
     }
 
-    public BigDecimal getTotalPriceWithoutDiscountCard() {
-        return totalPriceWithoutDiscountCard;
+    public BigDecimal getTotalPrice() {
+        return totalPrice;
     }
 
     public BigDecimal getTotalDiscount() {
@@ -112,12 +112,12 @@ public class Check {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Check check = (Check) o;
-        return Objects.equals(date, check.date) && Objects.equals(time, check.time) && Objects.equals(items, check.items) && Objects.equals(discountCard, check.discountCard) && Objects.equals(totalPriceWithoutDiscountCard, check.totalPriceWithoutDiscountCard) && Objects.equals(totalDiscount, check.totalDiscount) && Objects.equals(totalWithDiscount, check.totalWithDiscount);
+        return Objects.equals(date, check.date) && Objects.equals(time, check.time) && Objects.equals(items, check.items) && Objects.equals(discountCard, check.discountCard) && Objects.equals(totalPrice, check.totalPrice) && Objects.equals(totalDiscount, check.totalDiscount) && Objects.equals(totalWithDiscount, check.totalWithDiscount);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(date, time, items, discountCard, totalPriceWithoutDiscountCard, totalDiscount, totalWithDiscount);
+        return Objects.hash(date, time, items, discountCard, totalPrice, totalDiscount, totalWithDiscount);
     }
 
     @Override
@@ -127,7 +127,7 @@ public class Check {
                 ", time=" + time +
                 ", items=" + items +
                 ", discountCard=" + discountCard +
-                ", totalPriceWithoutDiscountCard=" + totalPriceWithoutDiscountCard +
+                ", totalPrice=" + totalPrice +
                 ", totalDiscount=" + totalDiscount +
                 ", totalWithDiscount=" + totalWithDiscount +
                 '}';
