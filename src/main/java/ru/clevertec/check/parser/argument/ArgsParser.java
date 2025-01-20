@@ -66,7 +66,7 @@ public class ArgsParser {
                 marshalers.computeIfAbsent("productsQuantity", k -> new ProductQuantityMarshaler());
 
         var numbers = element.split(Pattern.quote("-"));
-        var id = Integer.parseInt(numbers[0]);
+        var id = Long.parseLong(numbers[0]);
         var quantity = Integer.parseInt(numbers[1]);
         idQuantityMarshaler.addValue(id, quantity);
     }
