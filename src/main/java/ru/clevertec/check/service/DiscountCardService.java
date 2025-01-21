@@ -24,11 +24,13 @@ public class DiscountCardService {
         return discountCardRepository.findById(id);
     }
 
-    public DiscountCard getDiscountCardByNumber(Integer cardNumber) {
-        return discountCardRepository.findByNumber(cardNumber)
-                .orElseGet(() -> DiscountCard.builder()
-                        .number(cardNumber)
-                        .discountAmount(DEFAULT_DISCOUNT_AMOUNT)
-                        .build());
+    public Optional<DiscountCard> getDiscountCardByNumber(Integer cardNumber) {
+        return Optional.ofNullable(cardNumber)
+                .flatMap(number -> discountCardRepository.findByNumber(number)
+                        .or(() -> Optional.of(DiscountCard.builder()
+                                .number(number)
+                                .discountAmount(DEFAULT_DISCOUNT_AMOUNT)
+                                .build()))
+                );
     }
 }
