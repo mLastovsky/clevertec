@@ -59,7 +59,7 @@ public class ArgsParser {
         var discountCardMarshaler =
                 marshalers.computeIfAbsent("discountCard", k -> new DiscountCardMarshaler());
 
-        var discountCard = element.replace("discountCard=", "");
+        var discountCard = Integer.parseInt(element.replace("discountCard=", ""));
         discountCardMarshaler.addValue(discountCard);
     }
 
