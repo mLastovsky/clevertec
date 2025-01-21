@@ -73,11 +73,13 @@ public class ArgsParser {
         idQuantityMarshaler.addValue(id, quantity);
     }
 
-    public Map<String, ArgumentMarshaler> getMarshalers() {
-        return marshalers;
+    public Object getArgumentValueByNameOrDefault(String name, Object defaultValue) {
+        return getMarshalerByName(name)
+                .map(ArgumentMarshaler::getArgumentValue)
+                .orElse(defaultValue);
     }
 
-    public Optional<ArgumentMarshaler> getMarshalerByName(String name) {
-        return Optional.of(marshalers.get(name));
+    private Optional<ArgumentMarshaler> getMarshalerByName(String name) {
+        return Optional.ofNullable(marshalers.get(name));
     }
 }
