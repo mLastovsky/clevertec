@@ -4,7 +4,7 @@ import java.util.Objects;
 
 public class DiscountCard extends Entity {
 
-    private final String number;
+    private final Integer number;
     private final Integer discountAmount;
 
     private DiscountCard(builder builder) {
@@ -17,7 +17,7 @@ public class DiscountCard extends Entity {
         return new builder();
     }
 
-    public String getNumber() {
+    public Integer getNumber() {
         return number;
     }
 
@@ -27,7 +27,7 @@ public class DiscountCard extends Entity {
 
     public static class builder {
         private Long id;
-        private String number;
+        private Integer number;
         private Integer discountAmount;
 
         public builder id(Long id) {
@@ -35,7 +35,7 @@ public class DiscountCard extends Entity {
             return this;
         }
 
-        public builder number(String number) {
+        public builder number(Integer number) {
             this.number = number;
             return this;
         }

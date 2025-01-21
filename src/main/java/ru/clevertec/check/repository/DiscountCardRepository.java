@@ -6,6 +6,6 @@ import java.util.Optional;
 
 public interface DiscountCardRepository extends Repository<DiscountCard, Long> {
 
-    Optional<DiscountCard> findByNumber(String cardNumber);
+    Optional<DiscountCard> findByNumber(Integer cardNumber);
 
 }

@@ -14,7 +14,7 @@ public class CsvDiscountCardMapper implements CsvMapper<String, DiscountCard> {
 
         return DiscountCard.builder()
                 .id(Long.parseLong(fields[ID_INDEX]))
-                .number(fields[NUMBER_INDEX])
+                .number(Integer.parseInt(fields[NUMBER_INDEX]))
                 .discountAmount(Integer.valueOf(fields[DISCOUNT_PERCENTAGE_INDEX]))
                 .build();
     }
@@ -24,7 +24,7 @@ public class CsvDiscountCardMapper implements CsvMapper<String, DiscountCard> {
         return String.join(
                 SEPARATOR,
                 String.valueOf(discountCard.getId()),
-                discountCard.getNumber(),
+                String.valueOf(discountCard.getNumber()),
                 String.valueOf(discountCard.getDiscountAmount())
         );
     }

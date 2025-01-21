@@ -42,7 +42,7 @@ public class CsvDiscountCardRepository implements Csv, DiscountCardRepository {
     }
 
     @Override
-    public Optional<DiscountCard> findByNumber(String number) {
+    public Optional<DiscountCard> findByNumber(Integer number) {
         try {
             return readCsvFile(DEFAULT_DISCOUNT_CARD_FILE_PATH).stream()
                     .map(csvDiscountCardMapper::mapFrom)

@@ -24,7 +24,7 @@ public class DiscountCardService {
         return discountCardRepository.findById(id);
     }
 
-    public DiscountCard getDiscountCardByNumber(String cardNumber) {
+    public DiscountCard getDiscountCardByNumber(Integer cardNumber) {
         return discountCardRepository.findByNumber(cardNumber)
                 .orElseGet(() -> DiscountCard.builder()
                         .number(cardNumber)
