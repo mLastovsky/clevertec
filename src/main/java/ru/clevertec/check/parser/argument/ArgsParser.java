@@ -65,7 +65,7 @@ public class ArgsParser {
 
     private void processIdQuantityField(String element) {
         var idQuantityMarshaler =
-                marshalers.computeIfAbsent("productsQuantity", k -> new ProductQuantityMarshaler());
+                marshalers.computeIfAbsent("idQuantityPairs", k -> new ProductQuantityMarshaler());
 
         var numbers = element.split(Pattern.quote("-"));
         var id = Long.parseLong(numbers[0]);
