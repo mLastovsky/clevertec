@@ -25,12 +25,13 @@ public class DiscountCardService {
     }
 
     public Optional<DiscountCard> getDiscountCardByNumber(Integer cardNumber) {
-        return Optional.ofNullable(cardNumber)
-                .flatMap(number -> discountCardRepository.findByNumber(number)
-                        .or(() -> Optional.of(DiscountCard.builder()
-                                .number(number)
-                                .discountAmount(DEFAULT_DISCOUNT_AMOUNT)
-                                .build()))
-                );
+        return discountCardRepository.findByNumber(cardNumber);
+    }
+
+    public DiscountCard createDefaultDiscountCard(Integer cardNumber) {
+        return DiscountCard.builder()
+                .number(cardNumber)
+                .discountAmount(DEFAULT_DISCOUNT_AMOUNT)
+                .build();
     }
 }
