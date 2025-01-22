@@ -29,15 +29,20 @@ public class ProductService {
                 );
     }
 
-    public BigDecimal calculateWholesaleDiscount(Product product, Integer quantity){
+    public BigDecimal calculateWholesaleDiscountIfApplicable(Product product, Integer quantity) {
         if (isEligibleForWholesaleDiscount(product, quantity)) {
-            var totalPrice = product.getPrice().multiply(BigDecimal.valueOf(quantity));
-            return totalPrice.multiply(WHOLESALE_DISCOUNT_PERCENT).divide(BigDecimal.valueOf(100));
+            return calculateWholesaleDiscount(product, quantity);
         }
         return BigDecimal.ZERO;
+    }
+
+    public BigDecimal calculateWholesaleDiscount(Product product, Integer quantity) {
+        var totalPrice = product.getPrice().multiply(BigDecimal.valueOf(quantity));
+        return totalPrice.multiply(WHOLESALE_DISCOUNT_PERCENT).divide(BigDecimal.valueOf(100));
     }
 
     public boolean isEligibleForWholesaleDiscount(Product product, Integer quantity) {
         return product.isWholesaleProduct() && quantity >= WHOLESALE_THRESHOLD;
     }
+
 }
