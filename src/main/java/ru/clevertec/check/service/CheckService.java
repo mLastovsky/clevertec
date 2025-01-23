@@ -4,14 +4,16 @@ import main.java.ru.clevertec.check.exception.BadRequestException;
 import main.java.ru.clevertec.check.model.Check;
 import main.java.ru.clevertec.check.model.CheckItem;
 import main.java.ru.clevertec.check.model.DiscountCard;
+import main.java.ru.clevertec.check.model.Product;
+import main.java.ru.clevertec.check.model.ProductQuantity;
 import main.java.ru.clevertec.check.parser.argument.ArgsParser;
 import main.java.ru.clevertec.check.proxy.CheckSenderProxy;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class CheckService {
 
@@ -35,7 +37,7 @@ public class CheckService {
     public Check createCheck(String[] args) throws BadRequestException {
         var argsParser = new ArgsParser(args);
         var discountCardNumber = (Integer) argsParser.getArgumentValueByNameOrDefault("discountCard", null);
-        var idQuantityPairs = (Map<Long, Integer>) argsParser.getArgumentValueByNameOrDefault("idQuantityPairs", Map.of());
+        var productQuantities = (List<ProductQuantity>) argsParser.getArgumentValueByNameOrDefault("productQuantities", List.of());
         var balanceDebitCard = (BigDecimal) argsParser.getArgumentValueByNameOrDefault("balanceDebitCard", BigDecimal.ZERO);
 
         DiscountCard discountCard = null;
@@ -44,7 +46,7 @@ public class CheckService {
                     .orElse(discountCardService.createDefaultDiscountCard(discountCardNumber));
         }
 
-        var items = mapToCheckItems(idQuantityPairs, discountCard);
+        var items = convertToCheckItems(productQuantities, discountCard);
         var totalPrice = computeTotalPrice(items);
         var totalDiscount = computeDiscount(items);
         var totalWithDiscount = totalPrice.subtract(totalDiscount);
@@ -60,58 +62,54 @@ public class CheckService {
                 .build();
     }
 
-    private static BigDecimal computeDiscount(List<CheckItem> items) {
+    private List<CheckItem> convertToCheckItems(List<ProductQuantity> productQuantities, DiscountCard discountCard) throws BadRequestException {
+        List<CheckItem> checkItems = new ArrayList<>();
+        for (var element : productQuantities) {
+            checkItems.add(convertToCheckItem(element, discountCard));
+        }
+        return checkItems;
+    }
+
+    private CheckItem convertToCheckItem(ProductQuantity productQuantity, DiscountCard discountCard) throws BadRequestException {
+        var productId = productQuantity.getId();
+        var quantity = productQuantity.getQuantity();
+        var product = productService.getProductById(productId);
+        var totalDiscount = calculateDiscountsForCheckItem(product, quantity, discountCard);
+        var totalPrice = calculateTotalPriceForCheckItem(product, quantity);
+
+        return CheckItem.builder()
+                .product(product)
+                .quantityProduct(quantity)
+                .price(product.getPrice())
+                .discount(totalDiscount)
+                .total(totalPrice)
+                .build();
+    }
+
+    private BigDecimal calculateDiscountsForCheckItem(Product product, Integer quantity, DiscountCard discountCard) {
+        var wholesaleDiscount = productService.calculateWholesaleDiscountIfApplicable(product, quantity);
+
+        if (wholesaleDiscount.compareTo(BigDecimal.ZERO) > 0) {
+            return wholesaleDiscount;
+        }
+
+        return discountCardService.calculateCardDiscount(product, quantity, discountCard);
+    }
+
+
+    private BigDecimal calculateTotalPriceForCheckItem(Product product, Integer quantity) {
+        return product.getPrice().multiply(BigDecimal.valueOf(quantity));
+    }
+
+    private BigDecimal computeDiscount(List<CheckItem> items) {
         return items.stream()
                 .map(CheckItem::getDiscount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    private static BigDecimal computeTotalPrice(List<CheckItem> items) {
+    private BigDecimal computeTotalPrice(List<CheckItem> items) {
         return items.stream()
                 .map(CheckItem::getTotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-    }
-
-    private List<CheckItem> mapToCheckItems(Map<Long, Integer> productsQuantity, DiscountCard discountCard) throws BadRequestException {
-        return productsQuantity.entrySet().stream()
-                .map(entry -> mapToCheckItem(discountCard, entry))
-                .toList();
-    }
-
-    private CheckItem mapToCheckItem(DiscountCard discountCard, Map.Entry<Long, Integer> entry) {
-        try {
-            var productId = entry.getKey();
-            var quantity = entry.getValue();
-            var product = productService.getProductById(productId);
-
-            var wholesaleDiscount = productService.isEligibleForWholesaleDiscount(product, quantity)
-                    ? productService.calculateWholesaleDiscount(product, quantity)
-                    : BigDecimal.ZERO;
-
-            // Расчет скидки по карте, если оптовая скидка не применяется
-
-            BigDecimal cardDiscount = BigDecimal.ZERO;
-            if (discountCard != null) {
-                cardDiscount = wholesaleDiscount.compareTo(BigDecimal.ZERO) > 0
-                        ? BigDecimal.ZERO
-                        : productService.calculateCardDiscount(product, quantity, discountCard.getDiscountAmount());
-            }
-
-            // Общая скидка и итоговая стоимость
-            var totalDiscount = wholesaleDiscount.add(cardDiscount);
-            var totalPrice = product.getPrice()
-                    .multiply(BigDecimal.valueOf(quantity))
-                    .subtract(totalDiscount);
-
-            return CheckItem.builder()
-                    .product(product)
-                    .quantityProduct(quantity)
-                    .price(product.getPrice())
-                    .discount(totalDiscount)
-                    .total(totalPrice)
-                    .build();
-        } catch (BadRequestException e) {
-            throw new RuntimeException(e);
-        }
     }
 }
