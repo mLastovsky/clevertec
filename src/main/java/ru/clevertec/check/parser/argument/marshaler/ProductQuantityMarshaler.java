@@ -7,25 +7,25 @@ import java.util.List;
 
 public class ProductQuantityMarshaler implements ArgumentMarshaler{
 
-    private final List<ProductQuantity> productQuantity = new LinkedList<>();
+    private final List<ProductQuantity> productQuantities = new LinkedList<>();
 
     @Override
     public void addValue(Object... values) {
         var productId = (Long) values[0];
         var quantity = (Integer) values[1];
 
-        for(var entry : productQuantity) {
+        for(var entry : productQuantities) {
             if(entry.getId().equals(productId)) {
                 entry.setQuantity(entry.getQuantity() + quantity);
                 return;
             }
         }
 
-        productQuantity.add(new ProductQuantity(productId, quantity));
+        productQuantities.add(new ProductQuantity(productId, quantity));
     }
 
     @Override
     public Object getArgumentValue() {
-        return productQuantity;
+        return productQuantities;
     }
 }
