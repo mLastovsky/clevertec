@@ -33,7 +33,7 @@ public class ArgsParser {
 
     private void parseElement(String element) throws BadRequestException {
         if (element.matches(ID_QUANTITY_REGEX_TEMPLATE)) {
-            processIdQuantityField(element);
+            processProductQuantityField(element);
 
         } else if (element.matches(DISCOUNT_CARD_REGEX_TEMPLATE)) {
             processDiscountCard(element);
@@ -63,14 +63,14 @@ public class ArgsParser {
         discountCardMarshaler.addValue(discountCard);
     }
 
-    private void processIdQuantityField(String element) {
-        var idQuantityMarshaler =
-                marshalers.computeIfAbsent("idQuantityPairs", k -> new ProductQuantityMarshaler());
+    private void processProductQuantityField(String element) {
+        var productQuantitiesMarshaler =
+                marshalers.computeIfAbsent("productQuantities", k -> new ProductQuantityMarshaler());
 
         var numbers = element.split(Pattern.quote("-"));
         var id = Long.parseLong(numbers[0]);
         var quantity = Integer.parseInt(numbers[1]);
-        idQuantityMarshaler.addValue(id, quantity);
+        productQuantitiesMarshaler.addValue(id, quantity);
     }
 
     public Object getArgumentValueByNameOrDefault(String name, Object defaultValue) {
