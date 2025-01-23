@@ -1,8 +1,10 @@
 package main.java.ru.clevertec.check.service;
 
 import main.java.ru.clevertec.check.model.DiscountCard;
+import main.java.ru.clevertec.check.model.Product;
 import main.java.ru.clevertec.check.repository.DiscountCardRepository;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,5 +35,10 @@ public class DiscountCardService {
                 .number(cardNumber)
                 .discountAmount(DEFAULT_DISCOUNT_AMOUNT)
                 .build();
+    }
+
+    public BigDecimal calculateCardDiscount(Product product, Integer quantity, DiscountCard discountCard) {
+        var totalPrice = product.getPrice().multiply(BigDecimal.valueOf(quantity));
+        return totalPrice.multiply(BigDecimal.valueOf(discountCard.getDiscountAmount())).divide(BigDecimal.valueOf(100));
     }
 }
