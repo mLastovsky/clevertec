@@ -6,4 +6,6 @@ public interface CheckSenderProxy {
 
     void send(Check check);
 
+    void sendError(String error);
+
 }
