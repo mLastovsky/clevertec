@@ -8,7 +8,6 @@ import main.java.ru.clevertec.check.model.DiscountCard;
 import main.java.ru.clevertec.check.model.Product;
 import main.java.ru.clevertec.check.model.ProductQuantity;
 import main.java.ru.clevertec.check.parser.argument.ArgsParser;
-import main.java.ru.clevertec.check.proxy.CheckSenderProxy;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -20,42 +19,99 @@ public class CheckService {
 
     private final ProductService productService;
     private final DiscountCardService discountCardService;
-    private final CheckSenderProxy checkSenderProxy;
 
     public CheckService(ProductService productService,
-                        DiscountCardService discountCardService,
-                        CheckSenderProxy checkSenderProxy) {
+                        DiscountCardService discountCardService) {
         this.productService = productService;
         this.discountCardService = discountCardService;
-        this.checkSenderProxy = checkSenderProxy;
     }
 
-    public void generateReports(String[] args) throws BadRequestException, InternalServerError {
-        var check = createCheck(args);
-        checkSenderProxy.send(check);
+    public Check createCheck(ArgsParser argsParser) throws BadRequestException, InternalServerError {
+        var discountCard = getDiscountCard(argsParser);
+        var productQuantities = getProductQuantities(argsParser);
+
+        var checkItems = createCheckItems(productQuantities, discountCard);
+
+        return buildCheck(checkItems, discountCard);
     }
 
-    public Check createCheck(String[] args) throws BadRequestException, InternalServerError {
-        var argsParser = new ArgsParser(args);
+    private DiscountCard getDiscountCard(ArgsParser argsParser) {
         var discountCardNumber = (Integer) argsParser.getArgumentValueByNameOrDefault("discountCard", null);
-        var productQuantities = (List<ProductQuantity>) argsParser.getArgumentValueByNameOrDefault("productQuantities", List.of());
-        var balanceDebitCard = (BigDecimal) argsParser.getArgumentValueByNameOrDefault("balanceDebitCard", BigDecimal.ZERO);
 
-        DiscountCard discountCard = null;
         if (discountCardNumber != null) {
-            discountCard = discountCardService.getDiscountCardByNumber(discountCardNumber)
+            return discountCardService.getDiscountCardByNumber(discountCardNumber)
                     .orElse(discountCardService.createDefaultDiscountCard(discountCardNumber));
         }
 
-        var items = convertToCheckItems(productQuantities, discountCard);
-        var totalPrice = computeTotalPrice(items);
-        var totalDiscount = computeDiscount(items);
+        return null;
+    }
+
+    private List<ProductQuantity> getProductQuantities(ArgsParser argsParser) {
+        return (List<ProductQuantity>) argsParser.getArgumentValueByNameOrDefault("productQuantities", List.of());
+    }
+
+    private List<CheckItem> createCheckItems(List<ProductQuantity> productQuantities, DiscountCard discountCard)
+            throws BadRequestException, InternalServerError {
+
+        List<CheckItem> checkItems = new ArrayList<>();
+        for (ProductQuantity productQuantity : productQuantities) {
+            checkItems.add(createCheckItem(productQuantity, discountCard));
+        }
+        return checkItems;
+    }
+
+    private CheckItem createCheckItem(ProductQuantity productQuantity, DiscountCard discountCard)
+            throws BadRequestException, InternalServerError {
+
+        var product = productService.getProductById(productQuantity.getId());
+        validateStockAvailability(product, productQuantity.getQuantity());
+
+        var totalDiscount = calculateItemDiscount(product, productQuantity.getQuantity(), discountCard);
+        var totalPrice = calculateItemTotalPrice(product, productQuantity.getQuantity());
+
+        return CheckItem.builder()
+                .product(product)
+                .quantityProduct(productQuantity.getQuantity())
+                .price(product.getPrice())
+                .discount(totalDiscount)
+                .total(totalPrice)
+                .build();
+    }
+
+    private void validateStockAvailability(Product product, Integer requestedQuantity) throws InternalServerError {
+        if (product.getQuantityInStock() < requestedQuantity) {
+            throw new InternalServerError(String.format(
+                    "Insufficient stock for product ID %d. Requested: %d, Available: %d",
+                    product.getId(), requestedQuantity, product.getQuantityInStock()
+            ));
+        }
+    }
+
+    private BigDecimal calculateItemDiscount(Product product, Integer quantity, DiscountCard discountCard) {
+        var wholesaleDiscount = productService.calculateWholesaleDiscountIfApplicable(product, quantity);
+
+        if (wholesaleDiscount.compareTo(BigDecimal.ZERO) > 0) {
+            return wholesaleDiscount;
+        }
+
+        return discountCard != null
+                ? discountCardService.calculateCardDiscount(product, quantity, discountCard)
+                : BigDecimal.ZERO;
+    }
+
+    private BigDecimal calculateItemTotalPrice(Product product, Integer quantity) {
+        return product.getPrice().multiply(BigDecimal.valueOf(quantity));
+    }
+
+    private Check buildCheck(List<CheckItem> checkItems, DiscountCard discountCard) {
+        var totalPrice = computeTotalPrice(checkItems);
+        var totalDiscount = computeTotalDiscount(checkItems);
         var totalWithDiscount = totalPrice.subtract(totalDiscount);
 
         return Check.builder()
                 .date(LocalDate.now())
                 .time(LocalTime.now())
-                .items(items)
+                .items(checkItems)
                 .discountCard(discountCard)
                 .totalPrice(totalPrice)
                 .totalDiscount(totalDiscount)
@@ -63,57 +119,7 @@ public class CheckService {
                 .build();
     }
 
-    private List<CheckItem> convertToCheckItems(List<ProductQuantity> productQuantities, DiscountCard discountCard) throws BadRequestException, InternalServerError {
-        List<CheckItem> checkItems = new ArrayList<>();
-        for (var element : productQuantities) {
-            checkItems.add(convertToCheckItem(element, discountCard));
-        }
-        return checkItems;
-    }
-
-    private CheckItem convertToCheckItem(ProductQuantity productQuantity, DiscountCard discountCard) throws BadRequestException, InternalServerError {
-        var productId = productQuantity.getId();
-        var quantity = productQuantity.getQuantity();
-        var product = productService.getProductById(productId);
-
-        if(product.getQuantityInStock() < quantity){
-            throw new InternalServerError(
-                    String.format("Insufficient stock for product ID %d. Requested: %d, Available: %d",
-                    productId, quantity, product.getQuantityInStock()));
-        }
-
-        var totalDiscount = calculateDiscountsForCheckItem(product, quantity, discountCard);
-        var totalPrice = calculateTotalPriceForCheckItem(product, quantity);
-
-        return CheckItem.builder()
-                .product(product)
-                .quantityProduct(quantity)
-                .price(product.getPrice())
-                .discount(totalDiscount)
-                .total(totalPrice)
-                .build();
-    }
-
-    private BigDecimal calculateDiscountsForCheckItem(Product product, Integer quantity, DiscountCard discountCard) {
-        var wholesaleDiscount = productService.calculateWholesaleDiscountIfApplicable(product, quantity);
-
-        if (wholesaleDiscount.compareTo(BigDecimal.ZERO) > 0) {
-            return wholesaleDiscount;
-        }
-
-        if(discountCard != null){
-            return discountCardService.calculateCardDiscount(product, quantity, discountCard);
-        }
-
-        return BigDecimal.ZERO;
-    }
-
-
-    private BigDecimal calculateTotalPriceForCheckItem(Product product, Integer quantity) {
-        return product.getPrice().multiply(BigDecimal.valueOf(quantity));
-    }
-
-    private BigDecimal computeDiscount(List<CheckItem> items) {
+    private BigDecimal computeTotalDiscount(List<CheckItem> items) {
         return items.stream()
                 .map(CheckItem::getDiscount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
