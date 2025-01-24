@@ -1,14 +1,18 @@
 package main.java.ru.clevertec.check.parser.argument.marshaler;
 
+import java.nio.file.Path;
+
 public class SaveToFileMarshaler implements ArgumentMarshaler {
+
+    private Path saveFilePath;
 
     @Override
     public void addValue(Object... values) {
-
+        saveFilePath = (Path) values[0];
     }
 
     @Override
     public Object getArgumentValue() {
-        return null;
+        return saveFilePath;
     }
 }
