@@ -46,8 +46,14 @@ public class CheckService {
         return null;
     }
 
-    private List<ProductQuantity> getProductQuantities(ArgsParser argsParser) {
-        return (List<ProductQuantity>) argsParser.getArgumentValueByNameOrDefault("productQuantities", List.of());
+    private List<ProductQuantity> getProductQuantities(ArgsParser argsParser) throws BadRequestException {
+        var productQuantities = (List<ProductQuantity>) argsParser.getArgumentValueByNameOrDefault("productQuantities", List.of());
+
+        if (productQuantities.isEmpty()) {
+            throw new BadRequestException("No products provided. At least one product is required.");
+        }
+
+        return productQuantities;
     }
 
     private List<CheckItem> createCheckItems(List<ProductQuantity> productQuantities, DiscountCard discountCard)
