@@ -5,6 +5,7 @@ import main.java.ru.clevertec.check.model.CheckItem;
 import main.java.ru.clevertec.check.util.Csv;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.file.Path;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -13,64 +14,81 @@ import java.util.List;
 public class CsvCheckSenderProxy implements Csv, CheckSenderProxy {
 
     private static final Path DEFAULT_OUTPUT_FILE_PATH = Path.of("./src/main/result.csv");
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+    private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss");
 
     @Override
     public void send(Check check) {
-        var outputPath = DEFAULT_OUTPUT_FILE_PATH;
+        var csvContent = buildCheckCsvContent(check);
+        writeToFile(DEFAULT_OUTPUT_FILE_PATH, csvContent);
+    }
+
+    @Override
+    public void sendError(String error) {
+        var errorContent = buildErrorCsvContent(error);
+        writeToFile(DEFAULT_OUTPUT_FILE_PATH, errorContent);
+    }
+
+    private List<String> buildCheckCsvContent(Check check) {
         List<String> rows = new ArrayList<>();
 
-        rows.add(String.join(SEPARATOR, "Date", "Time"));
-        rows.add(String.join(SEPARATOR,
-                check.getDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")),
-                check.getTime().format(DateTimeFormatter.ofPattern("HH:mm:ss"))
-        ));
+        rows.add(buildRow("Date", "Time"));
+        rows.add(buildRow(check.getDate().format(DATE_FORMATTER), check.getTime().format(TIME_FORMATTER)));
         rows.add("");
 
-        rows.add(String.join(SEPARATOR, "QTY", "DESCRIPTION", "PRICE", "DISCOUNT", "TOTAL"));
-
-        for (CheckItem item : check.getItems()) {
-            rows.add(String.join(SEPARATOR,
-                    String.valueOf(item.getQuantityProduct()),
-                    item.getProduct().getDescription(),
-                    String.format("%.2f$", item.getPrice()),
-                    String.format("%.2f$", item.getDiscount()),
-                    String.format("%.2f$", item.getTotal())
-            ));
-        }
+        rows.add(buildRow("QTY", "DESCRIPTION", "PRICE", "DISCOUNT", "TOTAL"));
+        check.getItems().forEach(item -> rows.add(formatCheckItem(item)));
         rows.add("");
 
         if (check.getDiscountCard() != null) {
-            rows.add(String.join(SEPARATOR, "DISCOUNT CARD", "DISCOUNT PERCENTAGE"));
-            rows.add(String.join(SEPARATOR,
+            rows.add(buildRow("DISCOUNT CARD", "DISCOUNT PERCENTAGE"));
+            rows.add(buildRow(
                     String.valueOf(check.getDiscountCard().getNumber()),
                     String.format("%d%%", check.getDiscountCard().getDiscountAmount())
             ));
             rows.add("");
         }
 
-        rows.add(String.join(SEPARATOR, "TOTAL PRICE", "TOTAL DISCOUNT", "TOTAL WITH DISCOUNT"));
-        rows.add(String.join(SEPARATOR,
-                String.format("%.2f$", check.getTotalPrice()),
-                String.format("%.2f$", check.getTotalDiscount()),
-                String.format("%.2f$", check.getTotalWithDiscount())
+        rows.add(buildRow("TOTAL PRICE", "TOTAL DISCOUNT", "TOTAL WITH DISCOUNT"));
+        rows.add(buildRow(
+                formatCurrency(check.getTotalPrice()),
+                formatCurrency(check.getTotalDiscount()),
+                formatCurrency(check.getTotalWithDiscount())
         ));
 
+        return rows;
+    }
+
+    private List<String> buildErrorCsvContent(String error) {
+        List<String> rows = new ArrayList<>();
+        rows.add("ERROR");
+        rows.add(error);
+        return rows;
+    }
+
+    private void writeToFile(Path path, List<String> content) {
         try {
-            writeCsvFile(outputPath, rows);
+            writeCsvFile(path, content);
         } catch (IOException e) {
-            System.err.println("Failed to save check to file: " + e.getMessage());
+            System.err.printf("Failed to save to file '%s': %s%n", path, e.getMessage());
         }
     }
 
-    @Override
-    public void sendError(String error) {
-        var outputPath = DEFAULT_OUTPUT_FILE_PATH;
-        List<String> errorRow = List.of("Error", error);
+    private String buildRow(String... headers) {
+        return String.join(SEPARATOR, headers);
+    }
 
-        try {
-            writeCsvFile(outputPath, errorRow);
-        } catch (IOException e) {
-            System.err.println("Failed to save error to file: " + e.getMessage());
-        }
+    private String formatCheckItem(CheckItem item) {
+        return buildRow(
+                String.valueOf(item.getQuantityProduct()),
+                item.getProduct().getDescription(),
+                formatCurrency(item.getPrice()),
+                formatCurrency(item.getDiscount()),
+                formatCurrency(item.getTotal())
+        );
+    }
+
+    private String formatCurrency(BigDecimal amount) {
+        return String.format("%.2f$", amount);
     }
 }
