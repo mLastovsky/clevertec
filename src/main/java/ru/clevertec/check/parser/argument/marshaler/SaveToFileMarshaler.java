@@ -8,7 +8,7 @@ public class SaveToFileMarshaler implements ArgumentMarshaler {
 
     @Override
     public void addValue(Object... values) {
-        saveFilePath = (Path) values[0];
+        saveFilePath = Path.of((String) values[0]);
     }
 
     @Override
